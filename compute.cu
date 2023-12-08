@@ -7,11 +7,13 @@
 
 __global__
 void computePairwiseAccels(v3 *acceleration, v3 *position, double *mass){
-	int i = blockIdx.x*blockDim.x + threadIdx.x;
-    int j = blockIdx.y*blockDim.y + threadIdx.y;
 	int k;
 	v3 dist;
-	double mag_square, magnitude, magA;
+
+	int i = blockIdx.x*blockDim.x + threadIdx.x;
+   	int j = blockIdx.y*blockDim.y + threadIdx.y;
+	
+	double magnitude, magA, mag_square;
 
 	if(i < NUMENTITIES && j < NUMENTITIES){
 			if (i==j) {
