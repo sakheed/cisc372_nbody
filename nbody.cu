@@ -11,15 +11,14 @@
 v3 *hVel, *velocity;
 v3 *hPos, *position;
 double *mass;
-
-// CODE
-double *mass;
 v3 *acceleration;
+
 
 //initHostMemory: Create storage for numObjects entities in our system
 //Parameters: numObjects: number of objects to allocate
 //Returns: None
 //Side Effects: Allocates memory in the hVel, hPos, and mass global variables
+
 void initHostMemory(int numObjects)
 {
 	hVel = (v3 *)malloc(sizeof(v3) * numObjects);
@@ -97,33 +96,30 @@ int main(int argc, char **argv)
 {
 	clock_t t0=clock();
 	int t_now;
-	//srand(time(NULL));
 	srand(1234);
 	initHostMemory(NUMENTITIES);
 	planetFill();
 	randomFill(NUMPLANETS + 1, NUMASTEROIDS);
-	//now we have a system.
 	#ifdef DEBUG
 	printSystem(stdout);
 	#endif
 
-	// CODE
-	cudaMalloc(&acceleration, sizeof(v3)*NUMENTITIES*NUMENTITIES);
-	cudaMalloc(&velocity, sizeof(v3)*NUMENTITIES);
-	cudaMalloc(&position, sizeof(v3)*NUMENTITIES);
-	cudaMalloc(&mass, sizeof(double)*NUMENTITIES);
+	cudaMalloc(&mass, sizeof(double) * NUMENTITIES);
+	cudaMalloc(&position, sizeof(v3) * NUMENTITIES);
+	cudaMalloc(&velocity, sizeof(v3) * NUMENTITIES);
+	cudaMalloc(&acceleration, sizeof(v3) * NUMENTITIES * NUMENTITIES);
 
-	cudaMemcpy(velocity, hVel, sizeof(v3)*NUMENTITIES, cudaMemcpyHostToDevice);
-	cudaMemcpy(position, hPos, sizeof(v3)*NUMENTITIES, cudaMemcpyHostToDevice);
-	cudaMemcpy(mass, mass, sizeof(double)*NUMENTITIES, cudaMemcpyHostToDevice);	
+	cudaMemcpy(mass, mass, sizeof(double) * NUMENTITIES, cudaMemcpyHostToDevice);	
+	cudaMemcpy(position, hPos, sizeof(v3) * NUMENTITIES, cudaMemcpyHostToDevice);
+	cudaMemcpy(velocity, hVel, sizeof(v3) * NUMENTITIES, cudaMemcpyHostToDevice);
 
 
 	for (t_now=0;t_now<DURATION;t_now+=INTERVAL){
 		compute();
 	}
     
-	cudaMemcpy(hVel, velocity, sizeof(v3)*NUMENTITIES, cudaMemcpyDeviceToHost);
-        cudaMemcpy(hPos, position, sizeof(v3)*NUMENTITIES, cudaMemcpyDeviceToHost);
+	cudaMemcpy(hVel, velocity, sizeof(v3) * NUMENTITIES, cudaMemcpyDeviceToHost);
+        cudaMemcpy(hPos, position, sizeof(v3) * NUMENTITIES, cudaMemcpyDeviceToHost);
 
 	clock_t t1=clock()-t0;
 #ifdef DEBUG
@@ -131,9 +127,9 @@ int main(int argc, char **argv)
 #endif
 	printf("This took a total time of %f seconds\n",(double)t1/CLOCKS_PER_SEC);
 
-	cudaFree(acceleration);
-	cudaFree(velocity);
-	cudaFree(position);
 	cudaFree(mass);
+	cudaFree(position);
+	cudaFree(velocity);
+	cudaFree(acceleration);
 	freeHostMemory();
 }
